@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Cappy</title>
+	<link rel="stylesheet" type="text/css" href="node_modules/jquery-tags-input/dist/jquery.tagsinput.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+
+	<div id="container">
+
+		<div id="form-wrapper">
+
+			<div id="preview">
+				<div id="loading-percent">0%</div>
+			</div>
+
+			<form>
+				<div class="field">
+					<label for="title">Title</label>
+					<input type="text" id="title">
+				</div>
+				<div class="field">
+					<label for="tags">Tags (separated by comma or space)</label>
+					<input type="text" id="tags">
+				</div>
+				<div class="field">
+					<label for="notes">Notes/Description</label>
+					<textarea id="notes"></textarea>
+				</div>
+				<div class="field">
+					<button id="submit" disabled="disabled">Share with the humaans</button>
+				</div>
+
+				<input type="hidden" id="url">
+				<input type="hidden" id="favicon-url">
+
+			</form>
+
+		</div>
+
+		<div id="configuration-required-panel" class="hidden panel">
+
+			<p><strong>Hello.</strong> You need to <a href="#" class="options-link">configure Cappy</a> before you can take screenshots.</p>
+
+		</div>
+
+		<div id="invalid-panel" class="hidden panel">
+
+			<p><strong>Cappy cannot screenshot this page</strong> because of Chrome security settings.</p>
+
+		</div>
+
+		<div id="uh-oh-panel" class="hidden panel">
+
+			<p><strong>Uh oh, something went wrong!</strong> Try reloading the page and run this again.</p>
+
+		</div>
+
+	</div>
+
+	<!-- JavaScript and HTML must be in separate files for security. -->
+	<script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="node_modules/jquery-tags-input/dist/jquery.tagsinput.min.js"></script>
+	<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="js/popup.js"></script>
+</body>
+</html>

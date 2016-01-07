@@ -1,0 +1,10 @@
+{
+  "name": "cappy",
+  "dependencies": {
+    "jquery": "2.1.4",
+    "jquery-tags-input": "1.3.5"
+  },
+  "scripts": {
+    "build": "./build.sh"
+  }
+}
