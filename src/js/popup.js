@@ -354,6 +354,7 @@ function onMessage(request, sender, sendResponse) {
         // Update UI
         $('#uploading').hide();
         $('#uploading-done').show();
+        return true;
     }
     else if (request.message === 'uploadFailed' && request.jobId == jobId) {
 

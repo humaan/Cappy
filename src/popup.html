@@ -12,7 +12,6 @@
 	<div id="container">
 
 		<div id="form-wrapper">
-
 			<div id="preview">
 				<div id="loading-percent">0%</div>
 			</div>
@@ -38,25 +37,30 @@
 				<input type="hidden" id="favicon-url">
 
 			</form>
+		</div>
 
+		<div id="uploading" class="hidden panel">
+			<p><strong>Uploading...</strong> <span class="uploading-percent">0%</span></p>
+		</div>
+
+		<div id="uploading-done" class="hidden panel">
+			<p><strong>Done!</strong></p>
+		</div>
+
+		<div id="uploading-error" class="hidden panel">
+			<p><strong>Error uploading screenshot.</strong> Check your <a href="#" class="options-link">Caapture URL</a> is correct and that you have some internets.</p>
 		</div>
 
 		<div id="configuration-required-panel" class="hidden panel">
-
 			<p><strong>Hello.</strong> You need to <a href="#" class="options-link">configure Cappy</a> before you can take screenshots.</p>
-
 		</div>
 
 		<div id="invalid-panel" class="hidden panel">
-
 			<p><strong>Cappy cannot screenshot this page</strong> because of Chrome security settings.</p>
-
 		</div>
 
 		<div id="uh-oh-panel" class="hidden panel">
-
 			<p><strong>Uh oh, something went wrong!</strong> Try reloading the page and run this again.</p>
-
 		</div>
 
 	</div>
