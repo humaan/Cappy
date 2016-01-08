@@ -4,6 +4,23 @@ var options = {
     endpointUrl: ''
 };
 
+var jobId = 0;
+
+/**
+ * Opens the options screen.
+ */
+function openOptionsScreen() {
+
+    if (chrome.runtime.openOptionsPage) {
+
+        chrome.runtime.openOptionsPage();
+    }
+    else {
+
+        window.open(chrome.runtime.getURL('options.html'));
+    }
+}
+
 /**
  * Return the user's stored options from Chrome.
  */
@@ -33,12 +50,12 @@ function mergeOptions(newOptions) {
 function validateOptions(options) {
 
     var isValid = (
-        typeof options.name === 'string' &&
-        options.name.trim() !== '' &&
+        //typeof options.name === 'string' &&
+        //options.name.trim() !== '' &&
+        // TODO:...
         typeof options.endpointUrl === 'string' &&
         options.endpointUrl.trim() !== ''
     );
-    isValid = true; // TODO: remove
     if (!isValid) {
 
         throw {"name": "invalidOptions"};
@@ -50,11 +67,19 @@ function validateOptions(options) {
  */
 function getCurrentTabPromise() {
 
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
 
-        chrome.tabs.getSelected(null, function (tab) {
+        var currentTabQuery = {
+            "active": true,
+            "currentWindow": true
+        };
+        chrome.tabs.query(currentTabQuery, function (tab) {
 
-            resolve(tab);
+            if (tab.length !== 1) {
+
+                reject('Expected 1 tab but got ' + tab.length + '.');
+            }
+            resolve(tab[0]);
         });
     });
 }
@@ -93,12 +118,14 @@ function validateTabUrl(tab) {
 }
 
 /**
- * Injects the page JS. If this doesn't complete, then errors out.
+ * Injects the page JS if not already done. If this doesn't complete, then errors out.
  */
 function injectPageScriptPromise(tab) {
 
     return new Promise(function (resolve, reject) {
 
+        // Inject script
+        console.log('Injecting page JS');
         var isPageScriptInjected = false;
         chrome.tabs.executeScript(tab.id, {file: 'js/page.js'}, function() {
 
@@ -165,6 +192,8 @@ function showForm(tab) {
 
     // Show
     $('#form-wrapper').show();
+
+    return tab;
 }
 
 function hideHiddenElements() {
@@ -177,24 +206,58 @@ function hideHiddenElements() {
  */
 function submitForm() {
 
-    // TODO...
+    // Update UI
+    $('#form-wrapper').hide();
+    $('#uploading').show();
+
+    // Pass job off to background task
+    chrome.runtime.sendMessage({
+        "formData": {
+            "title": $('#title').val().trim(),
+            "tags": $('#tags').val().trim(),
+            "tagsTag": $('#tags_tag').val().trim(),
+            "notes": $('#notes').val().trim(),
+            "url": $('#url').val().trim(),
+            "faviconUrl": $('#favicon-url').val().trim(),
+            "apiKey": "abc123",
+            // TODO:...
+            "fullpageDataUri": fullpageDataUri,
+            "currentScreenDataUri": currentScreenDataUri,
+            //"name": options.name, // TODO:...
+            "endpointUrl": options.endpointUrl
+        }
+    }, function(response) {
+
+        jobId = response.jobId;
+    });
 
     // Done
     return false;
 }
 
 /**
- * Opens the options screen.
+ * Triggers the page to start scrolling.
  */
-function openOptionsScreen() {
+function sendScrollPageMessage(tab) {
 
-    if (chrome.runtime.openOptionsPage) {
+    chrome.tabs.sendMessage(tab.id, {message: 'scrollPage'}, function(response) {
 
-        chrome.runtime.openOptionsPage();
-    }
-    else {
+        // TODO...
+        console.log('Finished scrolling...');
+    });
 
-        window.open(chrome.runtime.getURL('options.html'));
+    return tab;
+}
+
+/**
+ * Message handler.
+ */
+function onMessage(request, sender, sendResponse) {
+
+    // Used to check if script has already been injected in page.
+    if (request.message === 'onScroll') {
+
+        sendResponse();
     }
 }
 
@@ -205,6 +268,12 @@ function init() {
 
     // Set any option screen links
     $('.options-link' ).bind('click', openOptionsScreen);
+
+    // Set listeners
+    /**
+     * Message listener.
+     */
+    chrome.runtime.onMessage.addListener(onMessage);
 
     // As most Chrome resources are fetched async, build a sequential promise chain to run through
     // the init steps in order.
@@ -219,9 +288,9 @@ function init() {
         .then(injectPageScriptPromise)
         // Done, show form and start taking screenshot
         .then(showForm)
+        .then(sendScrollPageMessage)
         .catch(onInitError);
 }
 
 // Go!
 init();
-

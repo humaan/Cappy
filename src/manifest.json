@@ -2,7 +2,7 @@
   "name": "Cappy.Dev",
   "version": "0.1",
   "manifest_version": 2,
-  "description": "Screenshot and share inspiring websites.",
+  "description": "Screenshot the current page and share with fellow humans!",
   "background": {
     "scripts": [
       "js/background.js"
