@@ -10,4 +10,6 @@ chrome.runtime.onInstalled.addListener(function() {
         contexts: ['browser_action'],
         enabled: false
     });
+
+    return true;
 });

@@ -5,7 +5,9 @@
   "description": "Screenshot the current page and share with fellow humans!",
   "background": {
     "scripts": [
-      "js/background.js"
+      "node_modules/jquery/dist/jquery.min.js",
+      "js/background.js",
+      "js/background-uploader.js"
     ],
     "persistent": false
   },

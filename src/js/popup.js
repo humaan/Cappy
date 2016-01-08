@@ -6,6 +6,9 @@ var options = {
 
 var jobId = 0;
 
+var fullPageScreenshot = null;
+var currentScreenDataUri = null;
+
 /**
  * Opens the options screen.
  */
@@ -212,19 +215,18 @@ function submitForm() {
 
     // Pass job off to background task
     chrome.runtime.sendMessage({
-        "formData": {
-            "title": $('#title').val().trim(),
-            "tags": $('#tags').val().trim(),
-            "tagsTag": $('#tags_tag').val().trim(),
-            "notes": $('#notes').val().trim(),
-            "url": $('#url').val().trim(),
-            "faviconUrl": $('#favicon-url').val().trim(),
-            "apiKey": "abc123",
-            // TODO:...
-            "fullpageDataUri": fullpageDataUri,
-            "currentScreenDataUri": currentScreenDataUri,
-            //"name": options.name, // TODO:...
-            "endpointUrl": options.endpointUrl
+        message: 'uploadScreenshot',
+        'formData': {
+            'title': $('#title').val().trim(),
+            'tags': $('#tags').val().trim(),
+            'tagsTag': $('#tags_tag').val().trim(),
+            'notes': $('#notes').val().trim(),
+            'url': $('#url').val().trim(),
+            'faviconUrl': $('#favicon-url').val().trim(),
+            'fullPageDataUri': fullPageScreenshot.canvas.toDataURL(),
+            'currentScreenDataUri': currentScreenDataUri,
+            'authToken': '', // TODO
+            'endpointUrl': options.endpointUrl
         }
     }, function(response) {
 
@@ -240,13 +242,97 @@ function submitForm() {
  */
 function sendScrollPageMessage(tab) {
 
-    chrome.tabs.sendMessage(tab.id, {message: 'scrollPage'}, function(response) {
-
-        // TODO...
-        console.log('Finished scrolling...');
-    });
+    chrome.tabs.sendMessage(tab.id, {message: 'scrollPage'}, onFullPageScreenshotComplete);
 
     return tab;
+}
+
+/**
+ *
+ */
+function onScroll(data, callback) {
+
+    // Update progress
+    $('#loading-percent').text(parseInt(data.complete * 100, 10) + '%');
+
+    // Scale as required
+    // Get window.devicePixelRatio from the page, not the popup
+    var scale = (data.devicePixelRatio && data.devicePixelRatio) !== 1 ? (1 / data.devicePixelRatio) : 1;
+    if (scale !== 1) {
+
+        data.x = data.x / scale;
+        data.y = data.y / scale;
+        data.totalWidth = data.totalWidth / scale;
+        data.totalHeight = data.totalHeight / scale;
+    }
+
+    // Ensure canvas elements created
+    if (fullPageScreenshot === null) {
+
+        var canvas = document.createElement('canvas');
+        canvas.width = data.totalWidth;
+        canvas.height = data.totalHeight;
+        fullPageScreenshot = {
+            canvas: canvas,
+            context: canvas.getContext('2d')
+        };
+    }
+
+    // Capture screen
+    captureScreen(data.x, data.y, fullPageScreenshot.context, callback);
+}
+
+/**
+ *
+ */
+function captureScreen(x, y, destinationContext, callback) {
+
+    chrome.tabs.captureVisibleTab(null, {format: 'png', quality: 100}, function(dataUri) {
+
+        if (!dataUri) {
+
+            return;
+        }
+        var image = new Image();
+        image.onload = function() {
+
+            if (destinationContext) {
+
+                destinationContext.drawImage(image, x, y);
+            }
+            if (callback) {
+
+                callback({dataUri: dataUri, image: image});
+            }
+        };
+        image.src = dataUri;
+    });
+
+}
+
+/**
+ * 	Once the fullpage screenshot is ready, triggers the creation of the current screen screenshot.
+ * 	After that is ready, displays preview and enables submit.
+ */
+function onFullPageScreenshotComplete() {
+
+    // Now capture just the current screen
+    captureScreen(0, 0, null, function(data) {
+
+        // Save screen
+        currentScreenDataUri = data.dataUri;
+
+        // Hide loading percent
+        $('#loading-percent' ).hide();
+
+        // Show image
+        $('#preview').append(data.image);
+        $('#preview').animate({'height':$('#preview img').height()}, 100);
+        $('#preview img').fadeIn(100);
+
+        // Enable submit
+        $('#submit').removeAttr('disabled');
+    });
 }
 
 /**
@@ -257,8 +343,28 @@ function onMessage(request, sender, sendResponse) {
     // Used to check if script has already been injected in page.
     if (request.message === 'onScroll') {
 
-        sendResponse();
+        onScroll(request, sendResponse);
     }
+    else if (request.message === 'uploadProgress' && request.jobId == jobId) {
+
+        $('.uploading-percent').text(request.percentComplete + '%');
+    }
+    else if (request.message === 'uploadDone' && request.jobId == jobId) {
+
+        // Update UI
+        $('#uploading').hide();
+        $('#uploading-done').show();
+    }
+    else if (request.message === 'uploadFailed' && request.jobId == jobId) {
+
+        // Update UI
+        $('#uploading').hide();
+        $('.endpoint-url' ).attr('href', options.endpointUrl);
+        $('#uploading-error').show();
+    }
+
+    // Must return true here otherwise the response isn't received
+    return true;
 }
 
 /**
@@ -270,9 +376,6 @@ function init() {
     $('.options-link' ).bind('click', openOptionsScreen);
 
     // Set listeners
-    /**
-     * Message listener.
-     */
     chrome.runtime.onMessage.addListener(onMessage);
 
     // As most Chrome resources are fetched async, build a sequential promise chain to run through

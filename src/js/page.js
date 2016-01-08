@@ -103,7 +103,7 @@ function scrollPage(callback) {
             cleanUp();
             if (callback) {
 
-                callback();
+                callback({}); // Send something back rather than undefined
             }
             return;
         }
@@ -163,8 +163,7 @@ function scrollPage(callback) {
 
 /**
  * Message handler. Ensure this is only set once as this script is called each time the browser action
- * is clicked. It's possible to only inject the script once, but that makes development harder as you
- * need to reload the page to see changes.
+ * is clicked.
  */
 if (!window.isCappyInjected) {
 
@@ -175,8 +174,8 @@ if (!window.isCappyInjected) {
         if (request.message === 'scrollPage') {
 
             scrollPage(sendResponse);
-            // Must return true here otherwise the response isn't received
-            return true;
         }
+        // Must return true here otherwise the response isn't received
+        return true;
     });
 }
