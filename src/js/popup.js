@@ -1,7 +1,8 @@
 
 var options = {
     name: '',
-    endpointUrl: ''
+    endpointUrl: '',
+    authToken: ''
 };
 
 var jobId = 0;
@@ -53,9 +54,8 @@ function mergeOptions(newOptions) {
 function validateOptions(options) {
 
     var isValid = (
-        //typeof options.name === 'string' &&
-        //options.name.trim() !== '' &&
-        // TODO:...
+        typeof options.authToken === 'string' &&
+        options.authToken.trim() !== '' &&
         typeof options.endpointUrl === 'string' &&
         options.endpointUrl.trim() !== ''
     );
@@ -225,7 +225,7 @@ function submitForm() {
             'faviconUrl': $('#favicon-url').val().trim(),
             'fullPageDataUri': fullPageScreenshot.canvas.toDataURL(),
             'currentScreenDataUri': currentScreenDataUri,
-            'authToken': '', // TODO
+            'authToken': options.authToken,
             'endpointUrl': options.endpointUrl
         }
     }, function(response) {
@@ -248,7 +248,8 @@ function sendScrollPageMessage(tab) {
 }
 
 /**
- *
+ *  Called each time the page has scrolled to a new segment. These events fire without waiting for
+ *  a response.
  */
 function onScroll(data, callback) {
 
@@ -283,7 +284,7 @@ function onScroll(data, callback) {
 }
 
 /**
- *
+ *  Captures the current screen adn writes it to the given context.
  */
 function captureScreen(x, y, destinationContext, callback) {
 
@@ -354,7 +355,6 @@ function onMessage(request, sender, sendResponse) {
         // Update UI
         $('#uploading').hide();
         $('#uploading-done').show();
-        return true;
     }
     else if (request.message === 'uploadFailed' && request.jobId == jobId) {
 
