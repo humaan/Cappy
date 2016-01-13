@@ -2,6 +2,10 @@
  * Adds save/restore functionality for the option popup.
  */
 
+/**
+ * Checks if all required fields of the login form are populated, and toggled the disabled state of
+ * the login button appropriately.
+ */
 function enableLoginIfComplete() {
 
     // Check if login enabled
@@ -47,50 +51,48 @@ function attemptLogin() {
             password: $('#password').val().trim()
         },
         type: 'POST',
-        // Options to tell JQuery not to process data
         dataType: 'json'
     })
-    // The order done and fail are defined matters: http://api.jquery.com/deferred.fail/
-    .done(function (response) {
+        .done(function (response) {
 
-        // Got a valid response. Can still be an error though.
-        if (typeof response.error !== 'undefined') {
+            // Got a valid response. Can still be an error though.
+            if (typeof response.error !== 'undefined') {
 
-            // Login failed
-            showError(response.error);
+                // Login failed
+                showError(response.error);
+                resetLoginForm();
+            }
+            else {
+
+                // Login success
+
+                // Clear form
+                $('#endpoint-url').val('');
+                $('#email').val('');
+                $('#password').val('');
+
+                // Save options
+                var data = {
+                    endpointUrl: endpointUrl,
+                    name: response.data.name,
+                    authToken: response.data.auth_token
+                };
+                chrome.storage.local.set(data, function () {
+
+                    // Show details
+                    showLoggedInDetails(data);
+                });
+            }
+        })
+        .fail(function (response) {
+
+            // Networking error, etc
+            var message = 'Unable to connect to your gallery site. Please check the URL is correct (';
+                message += '<a href="' + endpointUrl + '">' + endpointUrl + '</a>';
+                message += ') and that you have some internets.';
+            showError(message);
             resetLoginForm();
-        }
-        else {
-
-            // Login success
-
-            // Clear form
-            $('#endpoint-url').val('');
-            $('#email').val('');
-            $('#password').val('');
-
-            // Save options
-            var data = {
-                endpointUrl: endpointUrl,
-                name: response.data.name,
-                authToken: response.data.auth_token
-            };
-            chrome.storage.local.set(data, function () {
-
-                // Show details
-                showLoggedInDetails(data);
-            });
-        }
-    })
-    .fail(function (response) {
-
-        // Networking error, etc
-        var message = 'Unable to connect to your gallery site. Please check the URL is correct (';
-            message += '<a href="' + endpointUrl + '">' + endpointUrl + '</a>';
-            message += ') and that you have some internets.';
-        showError(message);
-        resetLoginForm();
-    });
+        });
 
     return false;
 }
@@ -175,11 +177,17 @@ function restoreOptions() {
     });
 }
 
-// Hide elements
-$('.hidden' ).hide();
+/**
+ * Sets up options page.
+ */
+function init() {
 
-// Event handlers
-$(document).bind('DOMContentLoaded', restoreOptions);
-$('input').bind('keyup', enableLoginIfComplete);
-$('#login').bind('click', attemptLogin);
-$('#logout').bind('click', logout);
+    // Event handlers
+    $(document).bind('DOMContentLoaded', restoreOptions);
+    $('input').bind('keyup', enableLoginIfComplete);
+    $('#login').bind('click', attemptLogin);
+    $('#logout').bind('click', logout);
+}
+
+// Go!
+init();

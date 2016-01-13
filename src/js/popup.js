@@ -361,7 +361,15 @@ function onMessage(request, sender, sendResponse) {
         // Update UI
         $('#uploading').hide();
         $('.endpoint-url' ).attr('href', options.endpointUrl);
-        $('#uploading-error').show();
+
+        if (request.isTokenInvalid) {
+
+            $('#uploading-auth-error').show();
+        }
+        else {
+
+            $('#uploading-error').show();
+        }
     }
 
     // Must return true here otherwise the response isn't received

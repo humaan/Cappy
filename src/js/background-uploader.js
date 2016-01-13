@@ -84,6 +84,7 @@ function uploadNextJob() {
         data: formData,
         type: 'POST',
         xhr: function() {  // custom xhr
+
             myXhr = $.ajaxSettings.xhr();
             if(myXhr.upload){ // if upload property exists
                 myXhr.upload.addEventListener('progress', function(e) {
@@ -107,24 +108,40 @@ function uploadNextJob() {
         contentType: false,
         processData: false
     })
-    .fail(function(response) {
+        .done(function (response) {
 
-        chrome.runtime.sendMessage({
-            message:"uploadFailed",
-            jobId: data.jobId
-        });
-        isUploading = false;
-        uploadNextJob();
-    })
-    .done(function(response) {
+            response = $.parseJSON(response);
+            var isTokenInvalid = (
+                typeof response.is_token_invalid !== 'undefined' &&
+                response.is_token_invalid
+            );
+            if (typeof response.error !== 'undefined') {
 
-        chrome.runtime.sendMessage({
-            message:"uploadDone",
-            jobId: data.jobId
+                chrome.runtime.sendMessage({
+                    message:"uploadFailed",
+                    jobId: data.jobId,
+                    isTokenInvalid: isTokenInvalid
+                });
+            }
+            else {
+
+                chrome.runtime.sendMessage({
+                    message:"uploadDone",
+                    jobId: data.jobId
+                });
+            }
+            isUploading = false;
+            uploadNextJob();
+        } )
+        .fail(function (response) {
+
+            chrome.runtime.sendMessage({
+                message:"uploadFailed",
+                jobId: data.jobId
+            });
+            isUploading = false;
+            uploadNextJob();
         });
-        isUploading = false;
-        uploadNextJob();
-    } );
 
 }
 
