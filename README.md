@@ -14,7 +14,7 @@ Here's an example of capturing the Apple homepage:
 ![Screenshot of Cappy capturing apple.com](/screenshot-thumb.png?raw=true)   
 ([View larger](/screenshot.png?raw=true))
 
-And the screenshots taken: [Current Screen](/example-current-screen.png?raw=true), [Fullscreen](/example-fullscreen.png?raw=true)
+And the screenshots taken: [Current screen](/example-current-screen.png?raw=true),  [Fullpage](/example-fullpage.png?raw=true).
 
 Structure
 -
