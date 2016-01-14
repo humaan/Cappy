@@ -9,9 +9,12 @@ Cappy was designed to work with a gallery website we built but isn't open-source
 
 Cappy has authentication built into it, so if using it on your own project you would need to modify or remove that component.
 
-![Screenshot of Cappy capturing apple.com](/screenshot-thumb.png?raw=true)
+Here's an example of capturing the Apple homepage:
 
+![Screenshot of Cappy capturing apple.com](/screenshot-thumb.png?raw=true)
 ([View larger](/screenshot.png?raw=true))
+
+And the two screenshots it takes: [Current Screen](/example-current-screen.png?raw=true), [Fullscreen](/example-fullscreen.png?raw=true)
 
 Structure
 -
