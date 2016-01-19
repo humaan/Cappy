@@ -199,11 +199,6 @@ function showForm(tab) {
     return tab;
 }
 
-function hideHiddenElements() {
-
-    $('.hidden').hide();
-}
-
 /**
  * Sends an upload job to the background uploader and updates the UI accordingly.
  */
