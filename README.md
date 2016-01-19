@@ -11,7 +11,7 @@ Cappy has authentication built into it, so if using it on your own project you w
 
 Here's an example of capturing the Apple homepage:
 
-![Screenshot of Cappy capturing apple.com](/demo/screenshot-thumb.png?raw=true)
+![Screenshot of Cappy capturing apple.com](/demo/screenshot-thumb.png?raw=true)   
 ([View larger](/demo/screenshot.png?raw=true))
 
 And the screenshots taken: [Current screen](/demo/example-current-screen.png?raw=true),  [Fullpage](/demo/example-fullpage.png?raw=true).
