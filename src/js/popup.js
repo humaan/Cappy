@@ -181,8 +181,7 @@ function showForm(tab) {
     $('#tags').tagsInput({
         autocomplete_url: options.endpointUrl + 'api/tags.php',
         height: 'auto',
-        width: 'auto',
-        delimiter: [',', ';', ' ']
+        width: 'auto'
     });
 
     // Inject info
