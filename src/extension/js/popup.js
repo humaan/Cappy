@@ -181,8 +181,7 @@ function showForm(tab) {
     $('#tags').tagsInput({
         autocomplete_url: options.endpointUrl + 'api/tags.php',
         height: 'auto',
-        width: 'auto',
-        delimiter: [',', ';', ' ']
+        width: 'auto'
     });
 
     // Inject info
@@ -197,11 +196,6 @@ function showForm(tab) {
     $('#form-wrapper').show();
 
     return tab;
-}
-
-function hideHiddenElements() {
-
-    $('.hidden').hide();
 }
 
 /**
