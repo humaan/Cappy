@@ -46,6 +46,3 @@ sitemap.xml.gz
 
 # IDEs
 *.idea/
-
-# build
-extension.zip
