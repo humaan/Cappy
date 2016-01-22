@@ -132,3 +132,14 @@ div.error {
     .ui-autocomplete li.ui-state-focus {
       background: #5eaee9;
       color: #fff; }
+
+.copyright {
+  padding: 0 18px;
+  margin-bottom: 20px; }
+
+.logout-form h1 {
+  line-height: 1.2;
+  text-align: center;
+  font-size: 20px; }
+  .logout-form h1 .name {
+    color: #f16161; }
