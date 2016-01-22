@@ -22,8 +22,7 @@ function enableLoginIfComplete() {
 }
 
 /**
- * Submits a login request via AJAX to the gallery API. On success, saves details to local storage and displays
- * logged in details, otherwise displays an error.
+ * Saves options to chrome storage.
  */
 function attemptLogin() {
 
