@@ -16,13 +16,6 @@ Here's an example of capturing the Apple homepage:
 
 And the screenshots taken: [Current screen](/demo/example-current-screen.png?raw=true),  [Fullpage](/demo/example-fullpage.png?raw=true).
 
-Structure
--
-
-popup.html - ...
-
-TODO...
-
 Instructions
 -
 
@@ -32,9 +25,9 @@ To make a release build:
 
 1. cd ./src
 2. npm install
-3. npm run build
+3. gulp dist
 
-The release version (mostly just excludes unneeded dependencies) will be in /src/extension.
+The release version (mostly just excludes unneeded dependencies) is output to /src/extension.zip, or you can see the files that went into the zip at /src/extension.
 
 Credits
 -

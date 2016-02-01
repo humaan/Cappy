@@ -1,5 +1,5 @@
 {
-  "name": "Cappy.Dev",
+  "name": "Cappy",
   "version": "0.1.1",
   "manifest_version": 2,
   "description": "Screenshot the current page and share with fellow humans!",
@@ -12,7 +12,7 @@
     "persistent": false
   },
   "browser_action": {
-    "default_icon": "images/icon.dev.png",
+    "default_icon": "images/icon.png",
     "default_popup": "popup.html",
     "default_title": "Hi"
   },

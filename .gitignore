@@ -48,4 +48,5 @@ sitemap.xml.gz
 *.idea/
 
 # build
+src/extension
 extension.zip
