@@ -21,13 +21,13 @@ Instructions
 
 To load the dev version, simple load the /src directory as an unpacked extension in Chrome.
 
-To make a release build:
+To make a release build (mostly just excludes unneeded dependencies):
 
 1. cd ./src
 2. npm install
 3. gulp dist
 
-The release version (mostly just excludes unneeded dependencies) is output to /src/extension.zip, or you can see the files that went into the zip at /src/extension.
+The unpacked release build is output to /src/extension, and a zip file ready for the Chrome Web Store is output to /src/extension.zip.
 
 Credits
 -
@@ -35,4 +35,3 @@ Credits
 While Cappy was mostly written from scratch, the first version of this project started life as a fork of Peter Coles'
 Full Page Screen Capture plugin (https://github.com/mrcoles/full-page-screen-capture-chrome-extension). Cappy still
 benefits from a number of solutions implemented in Peter's plugin, so thank you Peter (and others) for all your work!
-
