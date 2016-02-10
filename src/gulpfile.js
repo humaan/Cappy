@@ -51,7 +51,7 @@ gulp.task('dist:replace', ['dist:copy'], function (callback) {
     return gulp.src('extension/manifest.json')
         .pipe(replace('Cappy.Dev', 'Cappy'))
         .pipe(replace('icon.dev.png', 'icon.png'))
-        .pipe(gulp.dest(''));
+        .pipe(gulp.dest('extension'));
 });
 
 // Zip up the extension
