@@ -1,11 +1,12 @@
 {
   "name": "Cappy.Dev",
-  "version": "0.1.1",
-  "manifest_version": 2,
+  "version": "0.2.0",
+  "manifest_version": 3,
   "description": "Screenshot the current page and share with fellow humans!",
   "background": {
     "scripts": [
       "node_modules/jquery/dist/jquery.min.js",
+      "js/constants.js",
       "js/background.js",
       "js/background-uploader.js"
     ],

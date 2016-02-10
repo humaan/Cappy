@@ -77,6 +77,7 @@ function uploadNextJob() {
     formData.append('auth_token', data.authToken);
     formData.append('fullpage', dataUriToBlob(data.fullPageDataUri), 'fullpage.png');
     formData.append('current_screen', dataUriToBlob(data.currentScreenDataUri), 'current-screen.png');
+    formData.append('cappyApiVersion', TARGET_CAPPY_API_VERSION);
 
     // Submit request
     $.ajax({
@@ -115,12 +116,20 @@ function uploadNextJob() {
                 typeof response.is_token_invalid !== 'undefined' &&
                 response.is_token_invalid
             );
-            if (typeof response.error !== 'undefined') {
+            if (isTokenInvalid) {
 
                 chrome.runtime.sendMessage({
                     message:"uploadFailed",
                     jobId: data.jobId,
                     isTokenInvalid: isTokenInvalid
+                });
+            }
+            else if (typeof response.error !== 'undefined') {
+
+                chrome.runtime.sendMessage({
+                    message:"uploadFailed",
+                    jobId: data.jobId,
+                    error: response.error
                 });
             }
             else {

@@ -49,7 +49,8 @@ function attemptLogin() {
         url: endpointUrl + 'api/login.php',
         data: {
             email: $('#email').val().trim(),
-            password: $('#password').val().trim()
+            password: $('#password').val().trim(),
+            cappyApiVersion: TARGET_CAPPY_API_VERSION
         },
         type: 'POST',
         dataType: 'json'

@@ -360,9 +360,14 @@ function onMessage(request, sender, sendResponse) {
 
             $('#uploading-auth-error').show();
         }
+        else if (typeof request.error !== 'undefined') {
+
+            $('#uploading-error .reason').text(request.error);
+            $('#uploading-error').show();
+        }
         else {
 
-            $('#uploading-error').show();
+            $('#uploading-networking-error').show();
         }
     }
 
