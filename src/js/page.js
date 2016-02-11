@@ -3,6 +3,9 @@
  * 	hiding the scrollbars, etc, and letting the browser action know when to take each screenshot.
  */
 
+// Namespace to avoid clashing with page
+var Cappy = window.Cappy || {};
+
 /**
  * Based on the current window size, builds a queue of scrollpoints. Scrolls to each one and fires an event. The
  * provided callback is called once all points have been scrolled to.
@@ -11,7 +14,7 @@
  * We scroll to each chunk, send a message (which the popup can listen to), then after a delay scrolls again until
  * all done. The delay helps with rendering issues.
  */
-function scrollPage(callback) {
+Cappy.scrollPage = function (callback) {
 
     var MAX_WIDTH_PIXELS = 10000;
     var MAX_HEIGHT_PIXELS = 10000;
@@ -19,9 +22,9 @@ function scrollPage(callback) {
     var CAPTURE_DELAY = 150;
 
     // Get current screen position and scrollbar state
-    var originalOverflowStyle = document.documentElement.style.overflow;
-    var originalX = window.scrollX;
-    var originalY = window.scrollY;
+    Cappy.originalOverflowStyle = document.documentElement.style.overflow;
+    Cappy.originalX = window.scrollX;
+    Cappy.originalY = window.scrollY;
 
     // Disable all scrollbars. We'll restore the scrollbar state when we're done scrolling.
     document.documentElement.style.overflow = 'hidden';
@@ -100,7 +103,7 @@ function scrollPage(callback) {
         if (segments.length === 0) {
 
             // Done
-            cleanUp();
+            // Don't clean up automatically, wait to be asked
             if (callback) {
 
                 callback({}); // Send something back rather than undefined
@@ -116,7 +119,7 @@ function scrollPage(callback) {
         window.setTimeout(function() {
 
             // In case the below callback never returns, cleanup
-            var cleanUpTimeout = window.setTimeout(cleanUp, 1250);
+            var cleanUpTimeout = window.setTimeout(Cappy.cleanUp, 1250);
 
             var message = {
                 message: 'onScroll',
@@ -136,19 +139,10 @@ function scrollPage(callback) {
                 }
                 else {
 
-                    cleanUp();
+                    Cappy.cleanUp();
                 }
             });
         }, CAPTURE_DELAY);
-    }
-
-    /**
-     * Restore page state
-     */
-    function cleanUp() {
-
-        document.documentElement.style.overflow = originalOverflowStyle;
-        window.scrollTo(originalX, originalY);
     }
 
     /**
@@ -159,21 +153,38 @@ function scrollPage(callback) {
 
         return Math.max.apply(null, numArray);
     }
-}
+};
+
+/**
+ * Restore page state
+ */
+Cappy.cleanUp = function () {
+
+    document.documentElement.style.overflow = Cappy.originalOverflowStyle;
+    window.scrollTo(Cappy.originalX, Cappy.originalY);
+};
 
 /**
  * Message handler. Ensure this is only set once as this script is called each time the browser action
  * is clicked.
  */
-if (!window.isCappyInjected) {
+if (!Cappy.isInjected) {
 
-    window.isCappyInjected = true;
+    Cappy.isInjected = true;
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
         // Request to scroll the page
         if (request.message === 'scrollPage') {
 
-            scrollPage(sendResponse);
+            Cappy.scrollPage(sendResponse);
+        }
+        else if (request.message === 'cleanUp') {
+
+            Cappy.cleanUp();
+            if (sendResponse) {
+
+                sendResponse({}); // Send something back rather than undefined
+            }
         }
         // Must return true here otherwise the response isn't received
         return true;

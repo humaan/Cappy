@@ -370,31 +370,58 @@ function captureScreen(x, y, destinationContext, callback) {
 }
 
 /**
+ * Captures just the current screen.
+ */
+function captureCurrentScreenPromise(tab) {
+
+    return new Promise(function (resolve) {
+
+        captureScreen(0, 0, null, function(data) {
+
+            // Save screen
+            currentScreenDataUri = data.dataUri;
+
+            // Hide loading percent
+            $('#loading-percent' ).hide();
+
+            // Show image
+            $('#preview').append(data.image);
+            $('#preview').animate({'height':$('#preview img').height()}, 100);
+            $('#preview img').fadeIn(100);
+
+            // Enable submit
+            $('#submit').removeAttr('disabled');
+
+            resolve(tab);
+        });
+    });
+}
+
+/**
+ * Sends a message to the injected page script to clean up. E.g. restore scrollbars
+ */
+function sendCleanUpMessagePromise(tab) {
+
+    return new Promise(function (resolve) {
+
+        chrome.tabs.sendMessage(tab.id, {message: 'cleanUp'}, function (tab) {
+
+            resolve(tab);
+        });
+    });
+}
+
+/**
  * 	Once the fullpage screenshot is ready, triggers the creation of the current screen screenshot.
- * 	After that is ready, displays preview and enables submit.
+ * 	After that is ready, restores page to initial state, displays preview and enables submit.
  */
 function onFullPageScreenshotComplete() {
 
-    // Now capture just the current screen
-    captureScreen(0, 0, null, function(data) {
-
-        // Save screen
-        currentScreenDataUri = data.dataUri;
-
-        // Hide loading percent
-        $('#loading-percent' ).hide();
-
-        // Show image
-        $('#preview').append(data.image);
-        $('#preview').animate({'height':$('#preview img').height()}, 100);
-        $('#preview img').fadeIn(100);
-
-        // Enable submit
-        $('#submit').removeAttr('disabled');
-
-        // Restore window
-        restoreWindowSize()
-    });
+    Promise.resolve()
+        .then(getCurrentTabPromise)
+        .then(captureCurrentScreenPromise)
+        .then(sendCleanUpMessagePromise)
+        .then(restoreWindowSize);
 }
 
 /**
