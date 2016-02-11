@@ -6,7 +6,7 @@ var options = {
 };
 
 var jobId = 0;
-
+var initialWindowSize = null;
 var fullPageScreenshot = null;
 var currentScreenDataUri = null;
 
@@ -127,23 +127,87 @@ function injectPageScriptPromise(tab) {
 
     return new Promise(function (resolve, reject) {
 
-        // Inject script
-        console.log('Injecting page JS');
+        // Inject script. Do this after a slight delay to let the page settle.
         var isPageScriptInjected = false;
-        chrome.tabs.executeScript(tab.id, {file: 'js/page.js'}, function() {
+        window.setTimeout(function() {
 
-            isPageScriptInjected = true;
+            chrome.tabs.executeScript(tab.id, {file: 'js/page.js'}, function () {
 
-            // Done
-            resolve(tab);
-        });
+                isPageScriptInjected = true;
+
+                // Done
+                resolve(tab);
+            });
+        }, 500);
         window.setTimeout(function() {
 
             if (!isPageScriptInjected) {
 
                 reject('Injecting page script failed.');
             }
-        }, 1000);
+        }, 1500);
+    });
+}
+
+/**
+ * Stores the current window size, then resizes the window to have a 4:3 aspect ratio if (and only if) the width is
+ * greater than the height. Tries to do this by only adjusting the height, but will adjust both dimensions if required.
+ */
+function enforceWindowAspectRatioPromise(tab) {
+
+    return new Promise(function (resolve) {
+
+        // Get the current window
+        chrome.windows.get(chrome.windows.WINDOW_ID_CURRENT, null, function(window) {
+
+            // If the height is greater than the width, don't resize
+            if (window.height > window.width) {
+
+                // No resize required. Done.
+                resolve(tab);
+                return;
+            }
+
+            // Store the existing dimensions so we can restore
+            initialWindowSize = {
+                width: window.width,
+                height: window.height
+            };
+            var requiredDimensions = {
+                height: parseInt(window.width / 4 * 3)
+            };
+            // Check the screen can accommodate the change, otherwise adjust width and height to get the largest size we can
+            if (requiredDimensions.height > screen.availHeight) {
+
+                var shortfall = screen.availHeight / requiredDimensions.height;
+                requiredDimensions.width = parseInt(window.width * shortfall);
+                requiredDimensions.height = screen.availHeight;
+            }
+            chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, requiredDimensions, function () {
+
+                // Done
+                resolve(tab);
+            });
+        });
+    });
+}
+
+/**
+ * Restores the current window size using dimensions captured earlier.
+ */
+function restoreWindowSize() {
+
+    if (initialWindowSize === null) {
+
+        // Nothing to do
+        return;
+    }
+    chrome.windows.get(chrome.windows.WINDOW_ID_CURRENT, null, function(window) {
+
+        chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, initialWindowSize, function () {
+
+            // Done
+        });
     });
 }
 
@@ -327,6 +391,9 @@ function onFullPageScreenshotComplete() {
 
         // Enable submit
         $('#submit').removeAttr('disabled');
+
+        // Restore window
+        restoreWindowSize()
     });
 }
 
@@ -396,6 +463,7 @@ function init() {
         // Current tab
         .then(getCurrentTabPromise)
         .then(validateTabUrl)
+        .then(enforceWindowAspectRatioPromise)
         .then(injectPageScriptPromise)
         // Done, show form and start taking screenshot
         .then(showForm)
