@@ -37,6 +37,7 @@ gulp.task('dist:copy', ['dist:clean', 'styles'], function () {
         'js/**',
         'node_modules/jquery/dist/jquery.min.*',
         'node_modules/jquery-tags-input/dist/*',
+        'node_modules/node-vibrant/dist/vibrant.min.js',
         'manifest.json',
         '*.html'
     ];

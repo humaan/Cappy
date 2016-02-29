@@ -103,7 +103,8 @@ Cappy.scrollPage = function (callback) {
         if (segments.length === 0) {
 
             // Done
-            // Don't clean up automatically, wait to be asked
+            // Don't clean up automatically, as popup does not want scrollbars visible yet
+            Cappy.restoreScrollPosition();
             if (callback) {
 
                 callback({}); // Send something back rather than undefined
@@ -161,6 +162,14 @@ Cappy.scrollPage = function (callback) {
 Cappy.cleanUp = function () {
 
     document.documentElement.style.overflow = Cappy.originalOverflowStyle;
+    Cappy.restoreScrollPosition();
+};
+
+/**
+ * Restores the original scroll position
+ */
+Cappy.restoreScrollPosition = function () {
+
     window.scrollTo(Cappy.originalX, Cappy.originalY);
 };
 

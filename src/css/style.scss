@@ -23,7 +23,7 @@ p {
 #preview {
   background: #444;
   min-height: 180px;
-  max-height: 280px;
+  max-height: 240px;
   overflow: hidden;
   text-align: center;
   position: relative;
@@ -45,7 +45,6 @@ p {
   width: 360px;
   display: none;
 }
-
 
 .panel,
 form {
@@ -109,24 +108,48 @@ div.tagsinput input {
 }
 
 textarea {
-	height: 60px;
+  height: 60px;
 }
 
 input:focus, textarea:focus {
-	outline: none;
-	border: 1px solid #42b7e9 !important;
-	box-shadow: 0 0 5px 0px #42b7e9 !important;
+  outline: none;
+  border: 1px solid #42b7e9 !important;
+  box-shadow: 0 0 5px 0px #42b7e9 !important;
+}
+
+#palette-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  height: 16px;
+  background: #eaeaea;
+  border-radius: 3px;
+}
+
+#palette-list li {
+  display: inline-block;
+  height: 16px;
+}
+
+#palette-list li:first-child {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+#palette-list li:last-child {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 
 div.tagsinput {
-	padding-bottom: 3px;
+  padding-bottom: 3px;
 }
 
 div.tagsinput input, div.tagsinput input:focus {
-	border:none!important;
-	box-shadow: none!important;
-	padding: 0;
-	line-height: 28px;
+  border:none!important;
+  box-shadow: none!important;
+  padding: 0;
+  line-height: 28px;
 }
 
 div.error,

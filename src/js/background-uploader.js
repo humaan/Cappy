@@ -71,6 +71,7 @@ function uploadNextJob() {
     formData.append('title', data.title);
     formData.append('tags', data.tags);
     formData.append('tags_tag', data.tagsTag);
+    formData.append('palette', data.palette);
     formData.append('notes', data.notes);
     formData.append('url', data.url);
     formData.append('favicon_url', data.faviconUrl);

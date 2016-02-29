@@ -278,6 +278,7 @@ function submitForm() {
             'title': $('#title').val().trim(),
             'tags': $('#tags').val().trim(),
             'tagsTag': $('#tags_tag').val().trim(),
+            'palette': $('#palette').val().trim(),
             'notes': $('#notes').val().trim(),
             'url': $('#url').val().trim(),
             'faviconUrl': $('#favicon-url').val().trim(),
@@ -378,6 +379,20 @@ function captureCurrentScreenPromise(tab) {
 
         captureScreen(0, 0, null, function(data) {
 
+            // Extract colour palette
+            var vibrant = new Vibrant(data.image, 256, 3);
+            var swatches = vibrant.swatches();
+            for (var swatch in swatches) {
+
+                if (swatches.hasOwnProperty(swatch) && swatches[swatch] && typeof swatches[swatch].getHex !== 'undefined') {
+
+                    var hexCode = swatches[swatch].getHex();
+                    $('#palette-list').append('<li style="background-color: ' + hexCode + ';">&nbsp;</li>');
+                    $('#palette').val($('#palette').val() + hexCode);
+                }
+            }
+            $('#palette-list li').width(100 / Math.max($('#palette-list li').length, 1) + '%');
+
             // Save screen
             currentScreenDataUri = data.dataUri;
 
@@ -404,24 +419,11 @@ function sendCleanUpMessagePromise(tab) {
 
     return new Promise(function (resolve) {
 
-        chrome.tabs.sendMessage(tab.id, {message: 'cleanUp'}, function (tab) {
+        chrome.tabs.sendMessage(tab.id, {message: 'cleanUp'}, function () {
 
             resolve(tab);
         });
     });
-}
-
-/**
- * 	Once the fullpage screenshot is ready, triggers the creation of the current screen screenshot.
- * 	After that is ready, restores page to initial state, displays preview and enables submit.
- */
-function onFullPageScreenshotComplete() {
-
-    Promise.resolve()
-        .then(getCurrentTabPromise)
-        .then(captureCurrentScreenPromise)
-        .then(sendCleanUpMessagePromise)
-        .then(restoreWindowSize);
 }
 
 /**
@@ -467,6 +469,19 @@ function onMessage(request, sender, sendResponse) {
 
     // Must return true here otherwise the response isn't received
     return true;
+}
+
+/**
+ * 	Once the fullpage screenshot is ready, triggers the creation of the current screen screenshot.
+ * 	After that is ready, restores page to initial state, displays preview and enables submit.
+ */
+function onFullPageScreenshotComplete() {
+
+    Promise.resolve()
+        .then(getCurrentTabPromise)
+        .then(captureCurrentScreenPromise)
+        .then(sendCleanUpMessagePromise)
+        .then(restoreWindowSize);
 }
 
 /**
