@@ -279,6 +279,7 @@ function submitForm() {
             'tags': $('#tags').val().trim(),
             'tagsTag': $('#tags_tag').val().trim(),
             'palette': $('#palette').val().trim(),
+            'dominant': $('#dominant').val().trim(),
             'notes': $('#notes').val().trim(),
             'url': $('#url').val().trim(),
             'faviconUrl': $('#favicon-url').val().trim(),
@@ -375,23 +376,31 @@ function captureScreen(x, y, destinationContext, callback) {
  */
 function captureCurrentScreenPromise(tab) {
 
+    function componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
+    }
+
+    function rgbToHex(rgb) {
+        return "#" + componentToHex(rgb[0]) + componentToHex(rgb[1]) + componentToHex(rgb[2]);
+    }
+
     return new Promise(function (resolve) {
 
         captureScreen(0, 0, null, function(data) {
 
             // Extract colour palette
-            var vibrant = new Vibrant(data.image, 256, 3);
-            var swatches = vibrant.swatches();
-            for (var swatch in swatches) {
+            var colorThief = new ColorThief();
+            var palette = colorThief.getPalette(data.image, 6, 1);
+            for (var i = 0; i < palette.length; i++) {
 
-                if (swatches.hasOwnProperty(swatch) && swatches[swatch] && typeof swatches[swatch].getHex !== 'undefined') {
-
-                    var hexCode = swatches[swatch].getHex();
-                    $('#palette-list').append('<li style="background-color: ' + hexCode + ';">&nbsp;</li>');
-                    $('#palette').val($('#palette').val() + hexCode);
-                }
+                var hexCode = rgbToHex(palette[i]);
+                $('#palette-list').append('<li style="background-color: ' + hexCode + ';">&nbsp;</li>');
+                $('#palette').val($('#palette').val() + hexCode);
             }
             $('#palette-list li').width(100 / Math.max($('#palette-list li').length, 1) + '%');
+            var dominantColour = rgbToHex(colorThief.getColor(data.image, 1));
+            $('#dominant').val(dominantColour);
 
             // Save screen
             currentScreenDataUri = data.dataUri;

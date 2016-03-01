@@ -1,6 +1,6 @@
 {
   "name": "Cappy.Dev",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "manifest_version": 2,
   "description": "Screenshot the current page and share with fellow humans!",
   "background": {
