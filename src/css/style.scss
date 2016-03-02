@@ -51,6 +51,10 @@ form {
   padding: 16px 18px 14px 18px;
 }
 
+form.details {
+  padding-bottom: 0;
+}
+
 .field {
 	padding: 4px 0;
 }
@@ -69,7 +73,7 @@ button {
   width: 100%;
   border-radius: 2px;
   border: none;
-  padding: 20px 0;
+  padding: 16px 0;
   background: #f16161;
   font: bold 14px/20px "Avenir Next", Avenir, "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
   cursor: pointer;
@@ -121,14 +125,14 @@ input:focus, textarea:focus {
   list-style-type: none;
   margin: 0;
   padding: 0;
-  height: 16px;
+  height: 12px;
   background: #eaeaea;
   border-radius: 3px;
 }
 
 #palette-list li {
   display: inline-block;
-  height: 16px;
+  height: 12px;
 }
 
 #palette-list li:first-child {
@@ -183,9 +187,30 @@ div.error {
 	
 
 }
+
 .copyright {
-	padding: 0 18px;
-	margin-bottom: 20px;
+  padding: 0 18px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #999;
+  font-size: 11px;
+}
+
+.copyright a {
+  color: #999;
+  text-decoration: none;
+}
+
+.credit {
+  display: block;
+  padding: 6px 0 8px;
+  margin: 0;
+  color: #ccc;
+  font-size: 8px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 #logout-form h1 {

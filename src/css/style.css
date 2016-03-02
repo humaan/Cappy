@@ -44,8 +44,7 @@ form {
   padding: 16px 18px 14px 18px; }
 
 form.details {
-	padding-bottom: 0;
-}
+  padding-bottom: 0; }
 
 .field {
   padding: 4px 0; }
@@ -160,27 +159,24 @@ div.error {
 .copyright {
   padding: 0 18px;
   margin-bottom: 20px;
-  text-align: center; 
+  text-align: center;
   color: #999;
-  font-size: 11px;}
-  
+  font-size: 11px; }
+
 .copyright a {
-	color: #999;
-	text-decoration: none;	}
+  color: #999;
+  text-decoration: none; }
 
 .credit {
-	display: block;
-	padding: 6px 0 8px;
-	margin: 0;
-	color: #ccc;
-	font-size: 8px;
-	text-align: center;
-	text-decoration: none;
-	text-transform: uppercase;
-	letter-spacing: 2px;}
-
-#logout-form {
-	text-align: center;}
+  display: block;
+  padding: 6px 0 8px;
+  margin: 0;
+  color: #ccc;
+  font-size: 8px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 2px; }
 
 #logout-form h1 {
   line-height: 1.2;
