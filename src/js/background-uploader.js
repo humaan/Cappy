@@ -2,12 +2,11 @@
  *	This is an event page that handles uploading in the background, and can be queried for its state.
  */
 
-// Global variables only exist for the life of the page, so they get reset each time the page is unloaded.
-
 // Store an array of jobs to chug through.
 var jobs = [];
 var jobCounter = 0;
 var isUploading = false;
+var errors = [];
 
 /**
  * Listen for incoming jobs and queue them.
@@ -22,6 +21,21 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         jobs.push(request.formData);
         uploadNextJob();
         sendResponse({jobId:jobCounter});
+    }
+    else if (request.message === 'getUploadErrors') {
+
+        sendResponse({errors: errors});
+
+        // Getting the queue clears it
+        errors = [];
+    }
+    else if (request.message === 'restoreIcon') {
+
+        var manifest = chrome.runtime.getManifest();
+        chrome.browserAction.setIcon({
+            path: manifest.browser_action.default_icon
+        });
+
     }
 });
 
@@ -118,24 +132,29 @@ function uploadNextJob() {
                 typeof response.is_token_invalid !== 'undefined' &&
                 response.is_token_invalid
             );
-            if (isTokenInvalid) {
+            if (isTokenInvalid) { // User needs to log in again
 
-                chrome.runtime.sendMessage({
+                onUploadError({
                     message:"uploadFailed",
+                    title: data.title,
+                    url: data.url,
                     jobId: data.jobId,
                     isTokenInvalid: isTokenInvalid
                 });
             }
-            else if (typeof response.error !== 'undefined') {
+            else if (typeof response.error !== 'undefined') { // Server-side error
 
-                chrome.runtime.sendMessage({
+                onUploadError({
                     message:"uploadFailed",
+                    title: data.title,
+                    url: data.url,
                     jobId: data.jobId,
                     error: response.error
                 });
             }
-            else {
+            else { // Success
 
+                // Notify pop-up
                 chrome.runtime.sendMessage({
                     message:"uploadDone",
                     jobId: data.jobId
@@ -144,17 +163,47 @@ function uploadNextJob() {
             isUploading = false;
             uploadNextJob();
         } )
-        .fail(function (response) {
+        .fail(function (response) { // Network error
 
-            chrome.runtime.sendMessage({
+            onUploadError({
                 message:"uploadFailed",
+                title: data.title,
+                url: data.url,
                 jobId: data.jobId
             });
+
+            // Move on
             isUploading = false;
             uploadNextJob();
         });
-
 }
+
+/**
+ * Updates the app icon and sends the given error to the popup. However, if popup is not open,
+ * the message goes into a queue, for the pop-up to read when it's opened next.
+ * @param message
+ */
+function onUploadError(message) {
+
+    // Set the icon to error mode
+    chrome.browserAction.setIcon({
+        path: 'images/icon.error.png'
+    });
+
+    // Put the message into the queue
+    errors.push(message);
+
+    // Send the message
+    chrome.runtime.sendMessage(message, function (response) {
+
+        // The message was received, so take it back off the queue
+        if (typeof response !== 'undefined') {
+
+            errors.pop();
+        }
+    });
+}
+
 
 function dataUriToBlob(dataUri) {
 

@@ -218,12 +218,37 @@ function onInitError(error) {
 
     $('#form-wrapper').hide();
 
-    if (error.name === "invalidOptions") {
+    if (error.name === 'uploadErrors') {
+
+        // Display each error in turn
+        var isTokenInvalid = false;
+        var html = '';
+        for (var i = 0; i < error.errors.length; i++) {
+
+            if (typeof error.errors[i].isTokenInvalid !== 'undefined') {
+
+                isTokenInvalid = true;
+                break;
+            }
+            html += '<strong>Failed to upload <a href="' + error.errors[i].url + '" target="_blank">' + error.errors[i].title + '</a>:</strong><br />';
+            html += error.errors[i].error + '<br />';
+            html += '<br />';
+        }
+        if (isTokenInvalid) {
+
+            $('#uploading-auth-error').show();
+        }
+        else {
+
+            $('#queued-errors').html(html).show();
+        }
+    }
+    else if (error.name === 'invalidOptions') {
 
         // Show config required
         $('#configuration-required-panel').show();
     }
-    else if (error.name === "invalidTabUrl") {
+    else if (error.name === 'invalidTabUrl') {
 
         $('#invalid-panel').show();
     }
@@ -233,7 +258,7 @@ function onInitError(error) {
     }
 
     // Done
-    console.log('Init failed.', error);
+    //console.log('Init failed.', error);
 }
 
 /**
@@ -288,7 +313,7 @@ function submitForm() {
             'authToken': options.authToken,
             'endpointUrl': options.endpointUrl
         }
-    }, function(response) {
+    }, function (response) {
 
         jobId = response.jobId;
     });
@@ -474,6 +499,9 @@ function onMessage(request, sender, sendResponse) {
 
             $('#uploading-networking-error').show();
         }
+
+        // Send response so background knows we handled the error
+        sendResponse({handled: true});
     }
 
     // Must return true here otherwise the response isn't received
@@ -494,19 +522,57 @@ function onFullPageScreenshotComplete() {
 }
 
 /**
+ * Called when the popup is closing. Simply restores the icon to the regular one, as any error
+ * messages would have been viewed.
+ */
+function onPopupClosed() {
+
+    chrome.runtime.sendMessage({message: 'restoreIcon'});
+}
+
+/**
+ * Return the user's stored options from Chrome.
+ */
+function getUploadErrorsPromise() {
+
+    return new Promise(function (resolve, reject) {
+
+        chrome.runtime.sendMessage({message: 'getUploadErrors'}, function (response) {
+
+            // Note if there are errors we call reject, and if there are no errors, resolve.
+            if (typeof response.errors !== 'undefined' && response.errors.length > 0) {
+
+                reject({
+                    name: 'uploadErrors',
+                    errors: response.errors
+                })
+            }
+            else {
+
+                resolve();
+            }
+        });
+    });
+}
+
+/**
  *  Sets up required resources. If anything fails, displays error feedback and stops.
  */
 function init() {
 
+    // Set listeners
+    addEventListener('unload', onPopupClosed, true);
+    chrome.runtime.onMessage.addListener(onMessage);
+
     // Set any option screen links
     $('.options-link' ).bind('click', openOptionsScreen);
-
-    // Set listeners
-    chrome.runtime.onMessage.addListener(onMessage);
 
     // As most Chrome resources are fetched async, build a sequential promise chain to run through
     // the init steps in order.
     Promise.resolve()
+        // Check if there are existing errors that need to be shown. If there are, this will
+        // actually reject, and jump to the error handler
+        .then(getUploadErrorsPromise)
         // Stored options
         .then(getStoredOptionsPromise)
         .then(mergeOptions)
