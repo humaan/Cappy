@@ -123,6 +123,9 @@ input:focus, textarea:focus {
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px; }
 
+#tags {
+  min-height: 46px; }
+
 div.tagsinput {
   padding-bottom: 3px; }
 
