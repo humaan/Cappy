@@ -230,7 +230,7 @@ function onInitError(error) {
                 isTokenInvalid = true;
                 break;
             }
-            html += '<strong>Failed to upload <a href="' + error.errors[i].url + '" target="_blank">' + error.errors[i].title + '</a>:</strong><br />';
+            html += '<strong>Error uploading screenshot of <a href="' + error.errors[i].url + '" target="_blank">' + error.errors[i].title + '</a>.</strong><br />';
             html += error.errors[i].error + '<br />';
             html += '<br />';
         }
