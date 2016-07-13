@@ -19,7 +19,7 @@ And the screenshots taken: [Current screen](/demo/example-current-screen.png?raw
 Instructions
 -
 
-To load the dev version, simple load the /src directory as an unpacked extension in Chrome.
+To load the dev version, simply download the `/src` directory, install dependancies (`npm install`), then load the `/src` directory as an unpacked extension in Chrome.
 
 To make a release build (mostly just excludes unneeded dependencies):
 
